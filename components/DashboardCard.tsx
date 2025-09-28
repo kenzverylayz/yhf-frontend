@@ -3,18 +3,41 @@ import React from "react";
 type DashboardCardProps = {
   title?: string;
   children: React.ReactNode;
-  bgColor?: string;
+  className?: string;
+  hover?: boolean;
 };
 
-export const DashboardCard = ({ title, children, bgColor= 'bg-white' }: DashboardCardProps) => {
+export const DashboardCard = ({ 
+  title, 
+  children, 
+  className = "", 
+  hover = true 
+}: DashboardCardProps) => {
   return (
-    <div className={`rounded-xl ${bgColor} text-white p-6 shadow-md`}>
+    <div 
+      className={`
+        relative
+        rounded-xl 
+        bg-[var(--theme-bg-card)]
+        border border-[var(--theme-border-primary)]
+        text-[var(--theme-text-primary)]
+        p-6 
+        shadow-[var(--theme-shadow-card)]
+        transition-all duration-200 ease-in-out
+        ${hover ? 'hover:shadow-[var(--theme-shadow-hover)] hover:border-[var(--theme-border-accent)]' : ''}
+        ${className}
+      `}
+    >
       {title && (
-        <h2 className="mb-4 text-lg text-center font-semibold tracking-wide text-blue-200">
-          {title}
-        </h2>
+        <div className="mb-6 pb-4 border-b border-[var(--theme-border-primary)]">
+          <h2 className="text-lg font-semibold text-[var(--theme-text-primary)] tracking-wide">
+            {title}
+          </h2>
+        </div>
       )}
-      {children}
+      <div className="relative">
+        {children}
+      </div>
     </div>
   );
-}
+};

@@ -41,20 +41,56 @@ const mockData: ClvPoint[] = [
 ];
 
 export default function CLVChart({
-  title = "CLV Trend (last 14 days)",
+  title = "CLV Trend (Last 14 Days)",
   data = mockData,
   showGrid = true,
 }: CLVChartProps) {
   return (
-    <DashboardCard title={title} bgColor="bg-indigo-900">
+    <DashboardCard title={title}>
       <div className="h-64 w-full">
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-            {showGrid && <CartesianGrid strokeDasharray="3 3" />}
-            <XAxis dataKey="date" tickMargin={6} />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="clv" stroke="#38bdf8" dot={false} strokeWidth={2} />
+            {showGrid && (
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="var(--theme-border-primary)"
+                opacity={0.3}
+              />
+            )}
+            <XAxis 
+              dataKey="date" 
+              tickMargin={6}
+              tick={{ fill: 'var(--theme-text-muted)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--theme-border-primary)' }}
+              interval={1}
+            />
+            <YAxis 
+              tick={{ fill: 'var(--theme-text-muted)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--theme-border-primary)' }}
+            />
+            <Tooltip 
+              formatter={(value, name) => [value, 'CLV']}
+              contentStyle={{
+                backgroundColor: 'var(--theme-bg-card)',
+                border: '1px solid var(--theme-border-primary)',
+                borderRadius: '8px',
+                color: 'var(--theme-text-primary)',
+                boxShadow: 'var(--theme-shadow-card)'
+              }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="clv" 
+              stroke="var(--theme-accent-primary)" 
+              dot={false} 
+              strokeWidth={3}
+              activeDot={{ 
+                r: 6, 
+                fill: 'var(--theme-accent-primary)',
+                stroke: 'var(--theme-bg-primary)',
+                strokeWidth: 2
+              }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
