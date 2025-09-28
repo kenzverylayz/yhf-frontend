@@ -53,7 +53,7 @@ export default function CLVPieChart({
                       padding: '8px 12px',
                       boxShadow: 'var(--theme-shadow-card)'
                     }}>
-                      <p style={{ color: 'var(--theme-accent-primary)', margin: 0 }}>
+                      <p style={{ color: 'var(--theme-text-primary)', margin: 0 }}>
                         {data.name}: <span style={{ color: 'var(--theme-accent-primary)' }}>{data.value}%</span>
                       </p>
                     </div>

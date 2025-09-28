@@ -86,7 +86,7 @@ export default function CLVChart({
               strokeWidth={3}
               activeDot={{ 
                 r: 6, 
-                fill: 'var(--theme-accent-primary)',
+                fill: '#60A5FA', // Lighter blue when tooltip is active
                 stroke: 'var(--theme-bg-primary)',
                 strokeWidth: 2
               }}
