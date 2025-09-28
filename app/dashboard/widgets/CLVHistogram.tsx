@@ -42,13 +42,6 @@ export default function CLVHistogram({
       <div className="h-64 w-full">
         <ResponsiveContainer>
           <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }} isAnimationActive={false}>
-            {showGrid && (
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="var(--theme-border-primary)"
-                opacity={0.3}
-              />
-            )}
             <XAxis 
               dataKey="range" 
               tickMargin={6}

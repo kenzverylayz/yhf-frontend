@@ -50,13 +50,6 @@ export default function CLVChart({
       <div className="h-64 w-full">
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-            {showGrid && (
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="var(--theme-border-primary)"
-                opacity={0.3}
-              />
-            )}
             <XAxis 
               dataKey="date" 
               tickMargin={6}
