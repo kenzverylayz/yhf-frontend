@@ -79,7 +79,7 @@ export default function PieBreakdown({
                 wrapperStyle={{ 
                   color: "var(--theme-text-secondary)",
                   fontSize: '12px',
-                  paddingTop: '16px'
+                  paddingTop: '8px'
                 }}
               />
             )}
@@ -128,7 +128,7 @@ export default function PieBreakdown({
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 text-center">
+      <div className="mt-7 text-center">
         <div className="text-2xl font-bold text-[var(--theme-text-primary)]">
           ${total.toLocaleString()}
         </div>
