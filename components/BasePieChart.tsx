@@ -117,7 +117,7 @@ export default function BasePieChart({
               stroke="none"
               labelLine={false}
               label={({ value }) => {
-                const percentage = ((value / total) * 100).toFixed(0);
+                const percentage = ((value as number/ total) * 100).toFixed(0);
                 return `${percentage}%`;
               }}
             >
