@@ -1,32 +1,48 @@
 "use client";
-import {DashboardCard} from "@/components/DashboardCard";
+import { DashboardCard } from "@/components/DashboardCard";
 import FilterableTable from "@/components/FilterableTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Customer } from "@/types/customer";
+import { formatDateYMDUTC } from "@/utils/format"; 
+
+const moneyFmt = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
 
 const columns: ColumnDef<Customer>[] = [
   { accessorKey: "customerId", header: "ID" },
   { accessorKey: "name", header: "Customer" },
   { accessorKey: "email", header: "Email" },
-  { accessorKey: "clv", header: "CLV ($)", 
-    cell: ({ getValue }) => (
-      <span className="tabular-nums">
-        {Number(getValue()).toLocaleString()}
-      </span>
-    )
+
+  {
+    accessorKey: "clv",
+    header: "CLV ($)",
+    cell: ({ getValue }) => {
+      const n = Number(getValue() ?? 0);
+      return <span className="tabular-nums">{moneyFmt.format(n)}</span>;
+    },
   },
+
   { accessorKey: "orderCount", header: "Orders" },
   { accessorKey: "rfmSegment", header: "RFM Segment" },
-  { accessorKey: "firstOrdered", header: "First Ordered", 
-    cell: ({ getValue }) => new Date(String(getValue())).toLocaleDateString() },
-  { accessorKey: "lastOrdered", header: "Last Ordered", 
-    cell: ({ getValue }) => new Date(String(getValue())).toLocaleDateString() },
+
+  {
+    accessorKey: "firstOrdered",
+    header: "First Ordered",
+    cell: ({ getValue }) => formatDateYMDUTC(getValue() as Date | string | number),
+  },
+  {
+    accessorKey: "lastOrdered",
+    header: "Last Ordered",
+    cell: ({ getValue }) => formatDateYMDUTC(getValue() as Date | string | number),
+  },
 ];
 
 export default function CLV({ initialData }: { initialData: Customer[] }) {
   return (
     <DashboardCard title="Top Customers by CLV">
-      <FilterableTable<Customer> columns={columns} data={initialData} />
+      <FilterableTable<Customer> columns={columns} data={initialData ?? []} />
     </DashboardCard>
   );
 }
