@@ -13,7 +13,7 @@ type FilterableTableProps<TData> = {
 };
 
 export default function FilterableTable<TData>({
-  columns, data, height = 360,
+  columns, data, height = 354,
 }: FilterableTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [filter, setFilter] = React.useState("");
@@ -46,9 +46,9 @@ export default function FilterableTable<TData>({
       <div
         className="rounded-lg border border-[var(--theme-border-primary)] 
                    bg-[var(--theme-bg-secondary)] overflow-hidden"
-        style={{ maxHeight: height }}
+        style={{ height: height }}
       >
-        <div className="overflow-auto" style={{ maxHeight: height }}>
+        <div className="overflow-auto" style={{ height: height }}>
           <table className="min-w-full text-sm">
             {/* Sticky header */}
             <thead className="sticky top-0 z-10 bg-[var(--theme-bg-tertiary)]">

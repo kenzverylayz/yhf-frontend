@@ -47,7 +47,7 @@ export default function CLVChart({
 }: CLVChartProps) {
   return (
     <DashboardCard title={title}>
-      <div className="h-64 w-full">
+      <div className="h-64 w-full" style={{ outline: 'none' }}>
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
             <XAxis 

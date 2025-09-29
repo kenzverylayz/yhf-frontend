@@ -125,9 +125,24 @@ svg rect[fill="var(--theme-accent-primary)"]:focus {
   background-color: transparent !important;
 }
 
-/* Override input focus styles to prevent double borders */
-input:focus {
+/* Prevent focus outlines on chart elements */
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-pie,
+.recharts-pie *,
+.recharts-bar,
+.recharts-bar *,
+.recharts-line,
+.recharts-line * {
   outline: none !important;
   box-shadow: none !important;
-  border: 1px solid var(--theme-accent-primary) !important;
+}
+
+/* Prevent focus outlines on SVG elements */
+svg:focus,
+svg:focus-visible,
+svg *:focus,
+svg *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }

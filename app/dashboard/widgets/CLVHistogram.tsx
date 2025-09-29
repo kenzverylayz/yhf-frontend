@@ -39,7 +39,7 @@ export default function CLVHistogram({
 }: CLVHistogramProps) {
   return (
     <DashboardCard title={title}>
-      <div className="h-64 w-full">
+      <div className="h-64 w-full" style={{ outline: 'none' }}>
         <ResponsiveContainer>
           <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }} isAnimationActive={false}>
             <XAxis 
@@ -70,7 +70,8 @@ export default function CLVHistogram({
               isAnimationActive={false}
               activeBar={false}
               style={{
-                cursor: 'pointer'
+                cursor: 'default',
+                outline: 'none'
               }}
             >
               {data.map((entry, index) => (
@@ -79,7 +80,8 @@ export default function CLVHistogram({
                   fill="var(--theme-accent-primary)"
                   style={{
                     transition: 'fill 0.2s ease-in-out',
-                    cursor: 'pointer'
+                    cursor: 'default',
+                    outline: 'none'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.fill = '#60A5FA'; // Lighter blue
