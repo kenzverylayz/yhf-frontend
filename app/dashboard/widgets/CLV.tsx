@@ -25,7 +25,7 @@ const columns: ColumnDef<Customer>[] = [
 
 export default function CLV({ initialData }: { initialData: Customer[] }) {
   return (
-    <DashboardCard title="Top Customers by CLV" bgColor="bg-indigo-900">
+    <DashboardCard title="Top Customers by CLV">
       <FilterableTable<Customer> columns={columns} data={initialData} />
     </DashboardCard>
   );
