@@ -1,6 +1,6 @@
-import type { SegmentsDoc, ClvSegment } from "@/types/segment";
+import type { SegmentsDoc, ClVSegment } from "@/types/segment";
 
-export function mapSegmentsDoc(doc: SegmentsDoc): ClvSegment[] {
+export function mapSegmentsDoc(doc: SegmentsDoc): ClVSegment[] {
   return [
     { name: "High Spender", value: doc.highspender },
     { name: "Mid Spender", value: doc.midspender },
