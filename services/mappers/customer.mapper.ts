@@ -1,4 +1,4 @@
-import type { CustomerDoc, Customer } from "@/types/Customer";
+import type { CustomerDoc, Customer } from "@/types/customer";
 
 export function mapCustomerDoc(
   doc: FirebaseFirestore.QueryDocumentSnapshot<CustomerDoc>

@@ -1,8 +1,8 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase.admin";
-import { customerConverter } from "@/lib/firestore-converters";
+import { customerConverter, trendConverter } from "@/lib/firestore-converters";
 import { mapCustomerDoc } from "@/services/mappers/customer.mapper";
-import type { Customer, CustomerDoc } from "@/types/Customer";
+import type { Customer, CustomerDoc } from "@/types/customer";
 import { mapSegmentsDoc } from "@/services/mappers/segment.mapper";
 import type { ClVSegment, SegmentsDoc } from "@/types/segment";
 import { mapTrendDoc } from "@/services/mappers/trend.mapper";
@@ -46,13 +46,11 @@ export async function fetchClvSegments(): Promise<ClVSegment[]> {
   return data ? mapSegmentsDoc(data) : [];
 }
 
-export async function fetchClvTrends(limitCount = 30): Promise<Trend[]> {
-  const col = adminDb.collection("CLVTrends");
 
-  const snap = await col
-    .orderBy("date", "asc")
-    .limit(limitCount)
-    .get();
+export async function fetchClvTrends(limitCount = 30): Promise<Trend[]> {
+  const col = adminDb.collection("CLVTrends").withConverter(trendConverter);
+
+  const snap = await col.orderBy("date", "asc").limit(limitCount).get();
 
   return snap.docs.map(mapTrendDoc);
 }

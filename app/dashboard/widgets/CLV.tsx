@@ -2,7 +2,7 @@
 import {DashboardCard} from "@/components/DashboardCard";
 import FilterableTable from "@/components/FilterableTable";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { Customer } from "@/types/Customer";
+import type { Customer } from "@/types/customer";
 
 const columns: ColumnDef<Customer>[] = [
   { accessorKey: "customerId", header: "ID" },

@@ -9,7 +9,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 
 export type ClvPoint = {

@@ -1,7 +1,8 @@
 import type { TrendDoc, Trend } from "@/types/trend";
+import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 
 export function mapTrendDoc(
-  doc: FirebaseFirestore.QueryDocumentSnapshot<TrendDoc>
+  doc: QueryDocumentSnapshot<TrendDoc>
 ): Trend {
   const d = doc.data();
 
