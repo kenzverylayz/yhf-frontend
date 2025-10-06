@@ -36,7 +36,7 @@ const mockData: ClvBin[] = [
 export default function CLVHistogram({
   title = "CLV Distribution",
   data = mockData,
-  showGrid = true,
+  showGrid = false,
 }: CLVHistogramProps) {
   const formatter: TooltipProps<number, string>["formatter"] = (value) => [
     String(value),
