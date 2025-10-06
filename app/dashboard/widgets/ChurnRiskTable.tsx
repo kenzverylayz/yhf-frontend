@@ -3,6 +3,7 @@
 import { DashboardCard } from "@/components/DashboardCard";
 import FilterableTable from "@/components/FilterableTable";
 import EmailButton from "@/components/EmailButton";
+import { useEmail } from "@/lib/hooks/useEmail";
 import { imageToBase64 } from "@/lib/email-service";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
@@ -83,10 +84,9 @@ const mockChurnData: ChurnCustomer[] = [
   }
 ];
 
-
 export default function ChurnRiskTable() {
   const [posterBase64, setPosterBase64] = useState<string | undefined>(undefined);
-  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  const { isEmailSending, notification, sendEmail, clearNotification } = useEmail();
 
   // Load poster image and convert to base64
   useEffect(() => {
@@ -105,10 +105,19 @@ export default function ChurnRiskTable() {
   // Auto-hide notification after 3 seconds
   useEffect(() => {
     if (notification) {
-      const timer = setTimeout(() => setNotification(null), 3000);
+      const timer = setTimeout(() => clearNotification(), 3000);
       return () => clearTimeout(timer);
     }
-  }, [notification]);
+  }, [notification, clearNotification]);
+
+  const handleSendEmail = (customer: ChurnCustomer) => {
+    sendEmail({
+      customerEmail: customer.email,
+      customerName: customer.name,
+      posterBase64,
+      posterFilename: "special-offer-poster.png",
+    });
+  };
 
   const columns: ColumnDef<ChurnCustomer>[] = [
     { accessorKey: "id", header: "ID" },
@@ -141,11 +150,8 @@ export default function ChurnRiskTable() {
         <EmailButton
           customerEmail={row.original.email}
           customerName={row.original.name}
-          posterBase64={posterBase64}
-          posterFilename="special-offer-poster.png"
-          onEmailSent={(success, message) => {
-            setNotification({type: success ? 'success' : 'error', message});
-          }}
+          onClick={() => handleSendEmail(row.original)}
+          isLoading={isEmailSending(row.original.email)}
         />
       ),
     },
