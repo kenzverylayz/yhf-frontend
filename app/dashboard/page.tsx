@@ -2,6 +2,8 @@ import CLV from "./widgets/CLV";
 import CLVChart from "./widgets/CLVChart";
 import PieBreakdown from "./widgets/PieBreakdown";
 import CLVHistogram from "./widgets/CLVHistogram";
+import ChurnRiskTable from "./widgets/ChurnRiskTable";
+import PlaceholderPieChart from "./widgets/PlaceholderPieChart";
 import { fetchTopCustomers } from "@/services/clv.server";
 import CLVPieChart from "./widgets/PieCLVSegment";
 import { fetchClvSegments } from "@/services/clv.server";
@@ -24,6 +26,12 @@ export default async function DashboardPage() {
             
             {/* Third row: CLV Segments */}
             <CLVPieChart data={clvSegments} />
+            
+            {/* Fourth row: Churn Risk Table and Placeholder Chart */}
+            <div className="md:col-span-2">
+                <ChurnRiskTable />
+            </div>
+            <PlaceholderPieChart title="Churn Analysis" />
         </main>
     );
 }
