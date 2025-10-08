@@ -5,13 +5,15 @@ type DashboardCardProps = {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
+  headerActions?: React.ReactNode;
 };
 
 export const DashboardCard = ({ 
   title, 
   children, 
   className = "", 
-  hover = true 
+  hover = true,
+  headerActions
 }: DashboardCardProps) => {
   return (
     <div 
@@ -30,9 +32,16 @@ export const DashboardCard = ({
     >
       {title && (
         <div className="mb-6 pb-4 border-b border-[var(--theme-border-primary)]">
-          <h2 className="text-lg font-semibold text-[var(--theme-text-primary)] tracking-wide">
-            {title}
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-[var(--theme-text-primary)] tracking-wide">
+              {title}
+            </h2>
+            {headerActions && (
+              <div className="flex items-center">
+                {headerActions}
+              </div>
+            )}
+          </div>
         </div>
       )}
       <div className="relative">

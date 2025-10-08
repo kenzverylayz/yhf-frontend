@@ -1,9 +1,8 @@
 import CLV from "./widgets/CLV";
-import CLVChart from "./widgets/CLVChart";
+import RevenueByMonth from "./widgets/RevenueByMonth";
 import PieBreakdown from "./widgets/PieBreakdown";
-import CLVHistogram from "./widgets/CLVHistogram";
-import ChurnRiskTable from "./widgets/ChurnRiskTable";
-import PlaceholderPieChart from "./widgets/PlaceholderPieChart";
+import AverageOrderSize from "./widgets/AverageOrderSizeHistogram";
+import CustomerChurnValuePredictionTable from "./widgets/CustomerChurnValuePredictionTable";
 import { fetchTopCustomers } from "@/services/clv.server";
 import CLVPieChart from "./widgets/PieCLVSegment";
 import { fetchClvSegments } from "@/services/clv.server";
@@ -19,19 +18,18 @@ export default async function DashboardPage() {
                 <CLV initialData={topCustomers} />
             </div>
             
-            {/* Second row: CLV Acquisition Channel, CLV Distribution, CLV Trend */}
+            {/* Second row: CLV Acquisition Channel, Average Order Size per Month, Revenue by Month */}
             <PieBreakdown />
-            <CLVHistogram />
-            <CLVChart />
+            <AverageOrderSize />
+            <RevenueByMonth />
             
             {/* Third row: CLV Segments */}
             <CLVPieChart data={clvSegments} />
             
-            {/* Fourth row: Churn Risk Table and Placeholder Chart */}
-            <div className="md:col-span-2">
-                <ChurnRiskTable />
+            {/* Fourth row: Customer Churn & Value Prediction Table (full width) */}
+            <div className="col-span-full">
+                <CustomerChurnValuePredictionTable />
             </div>
-            <PlaceholderPieChart title="Churn Analysis" />
         </main>
     );
 }
