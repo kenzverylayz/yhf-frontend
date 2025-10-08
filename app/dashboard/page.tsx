@@ -1,7 +1,7 @@
 import CLV from "./widgets/CLV";
 import RevenueByMonth from "./widgets/RevenueByMonth";
 import PieBreakdown from "./widgets/PieBreakdown";
-import AverageOrderSize from "./widgets/CLVHistogram";
+import AverageOrderSize from "./widgets/AverageOrderSizeHistogram";
 import CustomerChurnValuePredictionTable from "./widgets/CustomerChurnValuePredictionTable";
 import { fetchTopCustomers } from "@/services/clv.server";
 import CLVPieChart from "./widgets/PieCLVSegment";
