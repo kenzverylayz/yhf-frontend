@@ -40,9 +40,12 @@ const columns: ColumnDef<Customer>[] = [
 ];
 
 export default function CLV({ initialData }: { initialData: Customer[] }) {
+  console.log('CLV component received customers:', initialData?.length, 'customers');
   return (
-    <DashboardCard title="Top Customers by CLV">
-      <FilterableTable<Customer> columns={columns} data={initialData ?? []} />
+    <DashboardCard title="Top Customers by CLV" fullHeight>
+      <div className="flex-1 min-h-0 flex flex-col">
+        <FilterableTable<Customer> columns={columns} data={initialData ?? []} />
+      </div>
     </DashboardCard>
   );
 }

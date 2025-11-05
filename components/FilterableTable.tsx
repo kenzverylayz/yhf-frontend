@@ -30,7 +30,7 @@ export default function FilterableTable<TData>({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col h-full">
       {/* Filter input */}
       <input
         value={filter}
@@ -39,16 +39,16 @@ export default function FilterableTable<TData>({
         className="w-full rounded-lg border border-[var(--theme-border-primary)] 
                    bg-[var(--theme-bg-secondary)] text-[var(--theme-text-primary)]
                    px-4 py-2 text-sm placeholder-[var(--theme-text-muted)]
-                   transition-colors"
+                   transition-colors flex-shrink-0"
       />
 
       {/* Table container */}
       <div
         className="rounded-lg border border-[var(--theme-border-primary)] 
-                   bg-[var(--theme-bg-secondary)] overflow-hidden"
-        style={{ height: height }}
+                   bg-[var(--theme-bg-secondary)] overflow-hidden flex-1 min-h-0"
+        style={height ? { height: height } : {}}
       >
-        <div className="overflow-auto" style={{ height: height }}>
+        <div className="overflow-auto h-full">
           <table className="min-w-full text-sm">
             {/* Sticky header */}
             <thead className="sticky top-0 z-10 bg-[var(--theme-bg-tertiary)]">

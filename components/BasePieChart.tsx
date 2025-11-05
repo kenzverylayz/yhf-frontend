@@ -53,7 +53,7 @@ export default function BasePieChart({
   showTotal = false,
   totalLabel = "Total",
   tooltipFormatter,
-  height = "h-72",
+  height = "h-96",
 }: BasePieChartProps) {
   const total = data.reduce((acc, d) => acc + d.value, 0);
   const colors = STANDARD_COLORS.slice(0, data.length);
@@ -88,11 +88,12 @@ export default function BasePieChart({
   };
 
   return (
-    <DashboardCard title={title}>
-      <div className={`${height} w-full`} style={{ outline: 'none' }}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Tooltip content={tooltipContent} />
+    <DashboardCard title={title} fullHeight>
+      <div className={`flex-1 min-h-0 w-full flex flex-col`} style={{ outline: 'none' }}>
+        <div className="flex-1 min-h-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Tooltip content={tooltipContent} />
             
             {showLegend && (
               <Legend
@@ -144,20 +145,21 @@ export default function BasePieChart({
                 );
               })}
             </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      {showTotal && (
-        <div className="mt-7 text-center">
-          <div className="text-2xl font-bold text-[var(--theme-text-primary)]">
-            ${total.toLocaleString()}
-          </div>
-          <div className="text-sm text-[var(--theme-text-muted)]">
-            {totalLabel}
-          </div>
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-      )}
+
+        {showTotal && (
+          <div className="mt-4 text-center flex-shrink-0">
+            <div className="text-2xl font-bold text-[var(--theme-text-primary)]">
+              ${total.toLocaleString()}
+            </div>
+            <div className="text-sm text-[var(--theme-text-muted)]">
+              {totalLabel}
+            </div>
+          </div>
+        )}
+      </div>
     </DashboardCard>
   );
 }
