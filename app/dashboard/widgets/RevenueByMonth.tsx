@@ -132,13 +132,18 @@ export default function RevenueByMonth({
               type="monotone"
               dataKey="revenue"
               stroke="var(--theme-accent-primary)"
-              dot={false}
+              dot={{
+                r: 5,
+                stroke: "var(--theme-border-accent)",
+                strokeWidth: 2,
+                fill: "var(--theme-accent-secondary)",
+              }}
               strokeWidth={3}
               activeDot={{
                 r: 6,
-                fill: "#60A5FA",
+                fill: "var(--theme-accent-primary)",
                 stroke: "var(--theme-bg-primary)",
-                strokeWidth: 2
+                strokeWidth: 3
               }}
             />
           </LineChart>

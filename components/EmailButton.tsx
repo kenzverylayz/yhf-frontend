@@ -22,8 +22,8 @@ export default function EmailButton({
       className={`
         px-3 py-1.5 text-xs font-medium rounded-md transition-colors
         ${disabled || isLoading
-          ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-          : 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+          ? 'bg-[#4b4b4b] text-[#9c9c9c] cursor-not-allowed' 
+          : 'bg-[var(--theme-accent-primary)] hover:bg-[var(--theme-accent-secondary)] text-white cursor-pointer shadow-[0_4px_12px_rgba(255,109,199,0.35)]'
         }
       `}
       title={isLoading ? 'Sending email...' : `Send email to ${customerName} (${customerEmail})`}

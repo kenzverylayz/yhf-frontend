@@ -30,6 +30,23 @@ type DashboardGridProps = {
   clvSegments: ClVSegment[];
 };
 
+const DEFAULT_WIDGET_ORDER: WidgetItem[] = [
+  { id: "clv", colSpan: "md:col-span-2" },
+  { id: "pieBreakdown", colSpan: "" },
+  { id: "averageOrderSize", colSpan: "" },
+  { id: "revenueByMonth", colSpan: "" },
+  { id: "clvPieChart", colSpan: "" },
+  { id: "customerChurn", colSpan: "col-span-full" },
+];
+
+const EQUAL_HEIGHT_WIDGETS: WidgetType[] = [
+  "clv",
+  "pieBreakdown",
+  "averageOrderSize",
+  "revenueByMonth",
+  "clvPieChart",
+];
+
 const WIDGET_CONFIG: Record<WidgetType, { defaultColSpan: string; component: React.ComponentType<any> }> = {
   clv: { 
     defaultColSpan: "md:col-span-2", 
@@ -119,37 +136,54 @@ const DraggableWidget = ({
 };
 
 export default function DashboardGrid({ topCustomers, clvSegments }: DashboardGridProps) {
-  const [widgets, setWidgets] = useState<WidgetItem[]>(() => {
-    // Initialize with default order
-    const defaultOrder: WidgetItem[] = [
-      { id: "clv", colSpan: "md:col-span-2" },
-      { id: "pieBreakdown", colSpan: "" },
-      { id: "averageOrderSize", colSpan: "" },
-      { id: "revenueByMonth", colSpan: "" },
-      { id: "clvPieChart", colSpan: "" },
-      { id: "customerChurn", colSpan: "col-span-full" },
-    ];
-    
-    // Try to load from localStorage
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("dashboard-widget-order");
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved) as WidgetItem[];
-          // Validate that all widgets are present
-          const defaultIds = defaultOrder.map(w => w.id);
-          const parsedIds = parsed.map((w) => w.id as WidgetType);
-          if (defaultIds.every((id) => parsedIds.includes(id)) && 
-              parsedIds.every((id) => defaultIds.includes(id))) {
-            return parsed;
-          }
-        } catch (e) {
-          // If parsing fails, use default
-        }
-      }
+  const [widgets, setWidgets] = useState<WidgetItem[]>(() =>
+    DEFAULT_WIDGET_ORDER.map((widget) => ({ ...widget }))
+  );
+
+  // Hydrate widget order from localStorage after mount to avoid SSR hydration mismatch
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
     }
-    return defaultOrder;
-  });
+
+    const saved = localStorage.getItem("dashboard-widget-order");
+    if (!saved) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as WidgetItem[];
+      const defaultIds = DEFAULT_WIDGET_ORDER.map((w) => w.id);
+      const parsedIds = parsed.map((w) => w.id as WidgetType);
+
+      const isValid =
+        defaultIds.every((id) => parsedIds.includes(id)) &&
+        parsedIds.every((id) => defaultIds.includes(id));
+
+      if (!isValid) {
+        return;
+      }
+
+      setWidgets((prev) => {
+        const prevIds = prev.map((w) => w.id);
+        const newIds = parsed.map((w) => w.id);
+        const isSameOrder =
+          prevIds.length === newIds.length &&
+          prevIds.every((id, index) => id === newIds[index]);
+
+        if (isSameOrder) {
+          return prev;
+        }
+
+        return parsed.map((widget) => ({
+          ...widget,
+          colSpan: widget.colSpan ?? WIDGET_CONFIG[widget.id].defaultColSpan,
+        }));
+      });
+    } catch {
+      // ignore malformed storage
+    }
+  }, []);
 
   // Save to localStorage whenever widgets change
   useEffect(() => {
@@ -175,8 +209,7 @@ export default function DashboardGrid({ topCustomers, clvSegments }: DashboardGr
     const colSpan = widget.colSpan ?? config.defaultColSpan;
 
     // Widgets that should have the same height (excluding customerChurn which is full width)
-    const equalHeightWidgets: WidgetType[] = ["clv", "pieBreakdown", "averageOrderSize", "revenueByMonth", "clvPieChart"];
-    const shouldHaveEqualHeight = equalHeightWidgets.includes(widget.id);
+    const shouldHaveEqualHeight = EQUAL_HEIGHT_WIDGETS.includes(widget.id);
 
     let props: any = {};
     if (widget.id === "clv") {

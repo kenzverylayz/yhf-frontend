@@ -13,20 +13,20 @@ import {
 
 // Standardized color palette for all pie charts
 const STANDARD_COLORS = [
-  "var(--theme-accent-primary)",    // Blue
-  "var(--theme-accent-secondary)",  // Violet
-  "var(--theme-accent-tertiary)",   // Cyan
-  "var(--theme-accent-success)",    // Emerald
-  "var(--theme-accent-warning)",    // Amber
+  "var(--theme-accent-primary)",   // Vibrant pink
+  "var(--theme-accent-secondary)", // Soft pastel pink
+  "var(--theme-accent-tertiary)",  // Hot pink
+  "#FF8BD9",                       // Mid-tone pink
+  "#FFB3E5",                       // Light blush pink
 ];
 
 // Color mapping for hover effects
 const HOVER_COLORS: Record<string, string> = {
-  "var(--theme-accent-primary)": "#60A5FA",
-  "var(--theme-accent-secondary)": "#A78BFA", 
-  "var(--theme-accent-tertiary)": "#22D3EE",
-  "var(--theme-accent-success)": "#34D399",
-  "var(--theme-accent-warning)": "#FCD34D",
+  "var(--theme-accent-primary)": "#FF85CF",
+  "var(--theme-accent-secondary)": "#FFBDEB", 
+  "var(--theme-accent-tertiary)": "#FF5EC1",
+  "#FF8BD9": "#FFA3E1",
+  "#FFB3E5": "#FFD1F1",
 };
 
 export type PieData = {

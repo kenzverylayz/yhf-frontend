@@ -2,42 +2,35 @@
 
 :root {
   /* Background Colors */
-  --theme-bg-primary: #0F172A;      /* Very dark blue-grey (slate-900) */
-  --theme-bg-secondary: #1E293B;     /* Dark blue-grey (slate-800) */
-  --theme-bg-tertiary: #334155;      /* Medium blue-grey (slate-700) */
-  --theme-bg-card: #1E293B;          /* Card background */
-  --theme-bg-hover: #334155;         /* Hover states */
+  --theme-bg-primary: #070707;       /* Near-black background */
+  --theme-bg-secondary: #0E0E0E;     /* Slightly lighter black */
+  --theme-bg-tertiary: #161616;      /* Soft charcoal */
+  --theme-bg-card: #131313;          /* Card background */
+  --theme-bg-hover: #1E1E1E;         /* Hover states */
   
   /* Text Colors */
-  --theme-text-primary: #FFFFFF;     /* Pure white for main text */
-  --theme-text-secondary: #CBD5E1;   /* Light grey for secondary text */
-  --theme-text-muted: #94A3B8;       /* Muted grey for labels */
-  --theme-text-accent: #60A5FA;      /* Blue accent for highlights */
+  --theme-text-primary: #FAFAFA;     /* Soft white for main text */
+  --theme-text-secondary: #FFC4E6;   /* Light pink for secondary text */
+  --theme-text-muted: #A1A1AA;       /* Neutral grey for labels */
+  --theme-text-accent: #FF6DC7;      /* Pink accent for highlights */
   
   /* Accent Colors */
-  --theme-accent-primary: #3B82F6;   /* Blue-500 - Primary actions */
-  --theme-accent-secondary: #8B5CF6; /* Violet-500 - Secondary elements */
-  --theme-accent-tertiary: #06B6D4;  /* Cyan-500 - Tertiary elements */
+  --theme-accent-primary: #FF6DC7;   /* Vibrant pink - Primary actions */
+  --theme-accent-secondary: #FFA6DD; /* Soft pink - Secondary elements */
+  --theme-accent-tertiary: #FF3FAD;  /* Hot pink - Tertiary elements */
   --theme-accent-success: #10B981;   /* Emerald-500 - Success states */
   --theme-accent-warning: #F59E0B;   /* Amber-500 - Warning states */
   --theme-accent-error: #EF4444;     /* Red-500 - Error states */
   
   /* Border Colors */
-  --theme-border-primary: #334155;   /* Main borders */
-  --theme-border-secondary: #475569; /* Subtle borders */
-  --theme-border-accent: #3B82F6;    /* Accent borders */
+  --theme-border-primary: #1F1F1F;   /* Main borders */
+  --theme-border-secondary: #2A2A2A; /* Subtle borders */
+  --theme-border-accent: #FF6DC7;    /* Accent borders */
   
   /* Shadows */
-  --theme-shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --theme-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --theme-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
-}
-
-@theme inline {
-  --color-background: var(--theme-bg-primary);
-  --color-foreground: var(--theme-text-primary);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --theme-shadow-card: 0 6px 18px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --theme-shadow-hover: 0 14px 30px rgba(255, 109, 199, 0.18), 0 6px 14px rgba(0, 0, 0, 0.55);
+  --theme-shadow-glow: 0 0 24px rgba(255, 109, 199, 0.35);
 }
 
 /* Base Styles */
