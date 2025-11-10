@@ -135,7 +135,7 @@ export default function AverageOrderSize({
             <Bar
               dataKey="averageOrderSize"
               fill="var(--theme-accent-primary)"
-              radius={[4, 4, 0, 0]}
+              radius={[6, 6, 0, 0]}
               isAnimationActive={false} 
               style={{ cursor: "default", outline: "none" }}
             >
@@ -149,7 +149,7 @@ export default function AverageOrderSize({
                     outline: "none",
                   }}
                   onMouseEnter={(e: React.MouseEvent<SVGRectElement>) => {
-                    e.currentTarget.style.fill = "#60A5FA";
+                    e.currentTarget.style.fill = "var(--theme-accent-secondary)";
                   }}
                   onMouseLeave={(e: React.MouseEvent<SVGRectElement>) => {
                     e.currentTarget.style.fill = "var(--theme-accent-primary)";
