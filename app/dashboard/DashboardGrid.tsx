@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import CLV from "./widgets/CLV";
@@ -70,6 +70,7 @@ const DraggableWidget = ({
   moveWidget: (dragIndex: number, hoverIndex: number) => void;
   children: React.ReactNode;
 }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
   const [{ isDragging }, drag] = useDrag({
     type: "widget",
     item: { id, index },
@@ -88,9 +89,12 @@ const DraggableWidget = ({
     },
   });
 
+  drop(ref);
+  drag(ref);
+
   return (
     <div
-      ref={(node) => drag(drop(node))}
+      ref={ref}
       className={`
         ${colSpan || ""} 
         cursor-move
@@ -131,12 +135,12 @@ export default function DashboardGrid({ topCustomers, clvSegments }: DashboardGr
       const saved = localStorage.getItem("dashboard-widget-order");
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
+          const parsed = JSON.parse(saved) as WidgetItem[];
           // Validate that all widgets are present
           const defaultIds = defaultOrder.map(w => w.id);
-          const parsedIds = parsed.map((w: WidgetItem) => w.id);
-          if (defaultIds.every(id => parsedIds.includes(id)) && 
-              parsedIds.every((id: string) => defaultIds.includes(id))) {
+          const parsedIds = parsed.map((w) => w.id as WidgetType);
+          if (defaultIds.every((id) => parsedIds.includes(id)) && 
+              parsedIds.every((id) => defaultIds.includes(id))) {
             return parsed;
           }
         } catch (e) {
