@@ -6,6 +6,7 @@ type DashboardCardProps = {
   className?: string;
   hover?: boolean;
   headerActions?: React.ReactNode;
+  fullHeight?: boolean;
 };
 
 export const DashboardCard = ({ 
@@ -13,7 +14,8 @@ export const DashboardCard = ({
   children, 
   className = "", 
   hover = true,
-  headerActions
+  headerActions,
+  fullHeight = false
 }: DashboardCardProps) => {
   return (
     <div 
@@ -27,11 +29,12 @@ export const DashboardCard = ({
         shadow-[var(--theme-shadow-card)]
         transition-all duration-200 ease-in-out
         ${hover ? 'hover:shadow-[var(--theme-shadow-hover)] hover:border-[var(--theme-border-accent)]' : ''}
+        ${fullHeight ? 'h-full flex flex-col' : ''}
         ${className}
       `}
     >
       {title && (
-        <div className="mb-6 pb-4 border-b border-[var(--theme-border-primary)]">
+        <div className={`pb-4 border-b border-[var(--theme-border-primary)] ${fullHeight ? 'mb-6 flex-shrink-0' : 'mb-6'}`}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-[var(--theme-text-primary)] tracking-wide">
               {title}
@@ -44,7 +47,7 @@ export const DashboardCard = ({
           </div>
         </div>
       )}
-      <div className="relative">
+      <div className={`relative ${fullHeight ? 'flex-1 flex flex-col min-h-0' : ''}`}>
         {children}
       </div>
     </div>

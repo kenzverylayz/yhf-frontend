@@ -94,6 +94,7 @@ export default function AverageOrderSize({
   return (
     <DashboardCard 
       title={title}
+      fullHeight
       headerActions={
         <YearFilter
           selectedYear={selectedYear}
@@ -102,7 +103,7 @@ export default function AverageOrderSize({
         />
       }
     >
-      <div className="h-64 w-full flex items-center justify-center" style={{ outline: "none" }}>
+      <div className="flex-1 min-h-0 w-full flex items-center justify-center" style={{ outline: "none" }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={currentYearData} margin={{ top: 8, right: 30, bottom: 0, left: 0 }}>
             <XAxis

@@ -88,6 +88,7 @@ export default function RevenueByMonth({
   return (
     <DashboardCard 
       title={title}
+      fullHeight
       headerActions={
         <YearFilter
           selectedYear={selectedYear}
@@ -97,7 +98,7 @@ export default function RevenueByMonth({
       }
     >
       
-      <div className="h-64 w-full flex items-center justify-center" style={{ outline: "none" }}>
+      <div className="flex-1 min-h-0 w-full flex items-center justify-center" style={{ outline: "none" }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={currentYearData} margin={{ top: 8, right: 30, bottom: 0, left: 0 }}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="var(--theme-border-primary)" />}
