@@ -1,6 +1,6 @@
+// app/dashboard/widgets/PieCLVSegment.tsx
 "use client";
 
-import React from "react";
 import BasePieChart from "@/components/BasePieChart";
 import type { ClVSegment } from "@/types/segment";
 
@@ -13,12 +13,17 @@ export default function CLVPieChart({
   title = "CLV Segments",
   data,
 }: CLVPieChartProps) {
+  const chartData = data.map((seg) => ({
+    name: seg.segment,      
+    value: seg.count,
+  }));
+
   return (
     <BasePieChart
       title={title}
-      data={data}
-      donut={true}
-      showLegend={true}
+      data={chartData}
+      donut
+      showLegend
       showTotal={false}
     />
   );

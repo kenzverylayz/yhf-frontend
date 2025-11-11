@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { DashboardCard } from "@/components/DashboardCard";
 import YearFilter from "@/components/YearFilter";
 import {
@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { TooltipProps } from "recharts";
+import type { AverageOrderSizeDoc } from "@/types/averageOrderSize";
 
 export type OrderSizePoint = {
   month: string;
@@ -21,70 +22,72 @@ export type OrderSizePoint = {
 
 type AverageOrderSizeProps = {
   title?: string;
-  data?: Record<number, OrderSizePoint[]>;
+  initialYear?: number;
+  data?: AverageOrderSizeDoc; // initial data for the initial year (from server)
   showGrid?: boolean;
 };
 
-// Mock data for different years
-const mockData: Record<number, OrderSizePoint[]> = {
-  2023: [
-    { month: "Jan", averageOrderSize: 2.3 },
-    { month: "Feb", averageOrderSize: 2.8 },
-    { month: "Mar", averageOrderSize: 2.5 },
-    { month: "Apr", averageOrderSize: 3.1 },
-    { month: "May", averageOrderSize: 2.7 },
-    { month: "Jun", averageOrderSize: 3.4 },
-    { month: "Jul", averageOrderSize: 3.0 },
-    { month: "Aug", averageOrderSize: 3.6 },
-    { month: "Sep", averageOrderSize: 3.2 },
-    { month: "Oct", averageOrderSize: 3.8 },
-    { month: "Nov", averageOrderSize: 3.5 },
-    { month: "Dec", averageOrderSize: 4.1 },
-  ],
-  2024: [
-    { month: "Jan", averageOrderSize: 4.2 },
-    { month: "Feb", averageOrderSize: 4.6 },
-    { month: "Mar", averageOrderSize: 4.4 },
-    { month: "Apr", averageOrderSize: 4.8 },
-    { month: "May", averageOrderSize: 4.5 },
-    { month: "Jun", averageOrderSize: 5.0 },
-    { month: "Jul", averageOrderSize: 4.8 },
-    { month: "Aug", averageOrderSize: 5.2 },
-    { month: "Sep", averageOrderSize: 5.0 },
-    { month: "Oct", averageOrderSize: 5.4 },
-    { month: "Nov", averageOrderSize: 5.2 },
-    { month: "Dec", averageOrderSize: 5.6 },
-  ],
-  2025: [
-    { month: "Jan", averageOrderSize: 5.8 },
-    { month: "Feb", averageOrderSize: 6.2 },
-    { month: "Mar", averageOrderSize: 6.0 },
-    { month: "Apr", averageOrderSize: 6.4 },
-    { month: "May", averageOrderSize: 6.2 },
-    { month: "Jun", averageOrderSize: 6.6 },
-    { month: "Jul", averageOrderSize: 6.4 },
-    { month: "Aug", averageOrderSize: 6.8 },
-    { month: "Sep", averageOrderSize: 6.6 },
-    { month: "Oct", averageOrderSize: 7.0 },
-    { month: "Nov", averageOrderSize: 6.8 },
-    { month: "Dec", averageOrderSize: 7.2 },
-  ],
-};
+const AVAILABLE_YEARS = [2023, 2024, 2025];
 
 export default function AverageOrderSize({
   title = "Average Order Size per Month",
-  data = mockData,
+  initialYear = AVAILABLE_YEARS[AVAILABLE_YEARS.length - 1],
+  data = [],
   showGrid = false,
 }: AverageOrderSizeProps) {
-  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedYear, setSelectedYear] = useState(initialYear);
+  const [rawData, setRawData] = useState<AverageOrderSizeDoc>(data ?? []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const currentYearData = useMemo(() => {
-    return data[selectedYear] || [];
-  }, [data, selectedYear]);
+  // Fetch data whenever the selected year changes.
+  useEffect(() => {
+    let cancelled = false;
 
-  const availableYears = useMemo(() => {
-    return Object.keys(data).map(Number).sort();
-  }, [data]);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const res = await fetch(`/api/average-order-size?year=${selectedYear}`);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch average order size: ${res.status}`);
+        }
+
+        const json: { year: number; data: AverageOrderSizeDoc } = await res.json();
+        if (!cancelled) {
+          setRawData(json.data ?? []);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(err.message ?? "Failed to load data");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedYear]);
+
+  // Transform raw backend data into the shape the chart expects.
+  const currentYearData = useMemo<OrderSizePoint[]>(() => {
+    return (rawData ?? []).map((entry) => {
+      const [yearStr, monthPart] = entry.month.split("-");
+      const label = monthPart ?? entry.month;
+      return {
+        month: label,
+        averageOrderSize: entry.average_order_size,
+      };
+    });
+  }, [rawData]);
 
   const formatter: TooltipProps<number, string>["formatter"] = (value) => [
     `${Number(value).toFixed(1)}`,
@@ -99,11 +102,21 @@ export default function AverageOrderSize({
         <YearFilter
           selectedYear={selectedYear}
           onYearChange={setSelectedYear}
-          years={availableYears}
+          years={AVAILABLE_YEARS}
         />
       }
     >
       <div className="flex-1 min-h-0 w-full flex items-center justify-center" style={{ outline: "none" }}>
+        {isLoading && (
+          <div className="absolute top-2 right-4 text-xs text-gray-400">
+            Loading…
+          </div>
+        )}
+        {error && (
+          <div className="absolute top-2 right-4 text-xs text-red-400">
+            {error}
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={currentYearData} margin={{ top: 8, right: 30, bottom: 0, left: 0 }}>
             <XAxis

@@ -10,7 +10,9 @@ import AverageOrderSize from "./widgets/AverageOrderSizeHistogram";
 import CustomerChurnValuePredictionTable from "./widgets/CustomerChurnValuePredictionTable";
 import CLVPieChart from "./widgets/PieCLVSegment";
 import type { Customer } from "@/types/customer";
-import type { ClVSegment } from "@/types/segment";
+import type { SegmentsDoc } from "@/types/segment";
+import type { AverageOrderSizeDoc } from "@/types/averageOrderSize";
+import type { RevenueByMonthDoc } from "@/types/revenueByMonth";
 
 type WidgetType = 
   | "clv" 
@@ -27,21 +29,21 @@ type WidgetItem = {
 
 type DashboardGridProps = {
   topCustomers: Customer[];
-  clvSegments: ClVSegment[];
+  clvSegments: SegmentsDoc;
+  averageOrderSize: AverageOrderSizeDoc;
+  revenueByMonth: RevenueByMonthDoc;
+  customerPredictions: Customer[];
 };
 
 const DEFAULT_WIDGET_ORDER: WidgetItem[] = [
-  { id: "clv", colSpan: "md:col-span-2" },
-  { id: "pieBreakdown", colSpan: "" },
+  { id: "customerChurn", colSpan: "col-span-full" }, // top full-width
   { id: "averageOrderSize", colSpan: "" },
   { id: "revenueByMonth", colSpan: "" },
   { id: "clvPieChart", colSpan: "" },
-  { id: "customerChurn", colSpan: "col-span-full" },
+  { id: "clv", colSpan: "col-span-full" }, // bottom full-width
 ];
 
 const EQUAL_HEIGHT_WIDGETS: WidgetType[] = [
-  "clv",
-  "pieBreakdown",
   "averageOrderSize",
   "revenueByMonth",
   "clvPieChart",
@@ -49,7 +51,7 @@ const EQUAL_HEIGHT_WIDGETS: WidgetType[] = [
 
 const WIDGET_CONFIG: Record<WidgetType, { defaultColSpan: string; component: React.ComponentType<any> }> = {
   clv: { 
-    defaultColSpan: "md:col-span-2", 
+    defaultColSpan: "col-span-full", 
     component: CLV 
   },
   pieBreakdown: { 
@@ -135,7 +137,13 @@ const DraggableWidget = ({
   );
 };
 
-export default function DashboardGrid({ topCustomers, clvSegments }: DashboardGridProps) {
+export default function DashboardGrid({
+  topCustomers,
+  clvSegments,
+  averageOrderSize,
+  revenueByMonth,
+  customerPredictions,
+}: DashboardGridProps) {
   const [widgets, setWidgets] = useState<WidgetItem[]>(() =>
     DEFAULT_WIDGET_ORDER.map((widget) => ({ ...widget }))
   );
@@ -200,24 +208,33 @@ export default function DashboardGrid({ topCustomers, clvSegments }: DashboardGr
       return newWidgets;
     });
   }, []);
-
+ 
   const renderWidget = (widget: WidgetItem, index: number) => {
     const config = WIDGET_CONFIG[widget.id];
     const Component = config.component;
 
-    // Preserve original colSpan if it exists, otherwise use default
-    const colSpan = widget.colSpan ?? config.defaultColSpan;
+    // Force full-width for clv and customerChurn; otherwise use saved or default colSpan
+    const colSpan =
+      widget.id === "clv" || widget.id === "customerChurn"
+        ? "col-span-full"
+        : widget.colSpan ?? config.defaultColSpan;
 
-    // Widgets that should have the same height (excluding customerChurn which is full width)
+    // Only chart widgets share equal fixed height
     const shouldHaveEqualHeight = EQUAL_HEIGHT_WIDGETS.includes(widget.id);
 
     let props: any = {};
     if (widget.id === "clv") {
       props.initialData = topCustomers;
     } else if (widget.id === "clvPieChart") {
-      props.data = clvSegments;
+      props.data = clvSegments.segments;
+    } else if (widget.id === "averageOrderSize") {
+      props.data = averageOrderSize;
+    } else if (widget.id === "revenueByMonth") {
+      props.data = revenueByMonth;
+    } else if (widget.id === "customerChurn") {
+      props.data = customerPredictions;
     }
-
+    console.log("Widget props", widget.id, props);
     return (
       <DraggableWidget
         key={widget.id}
@@ -227,7 +244,7 @@ export default function DashboardGrid({ topCustomers, clvSegments }: DashboardGr
         moveWidget={moveWidget}
       >
         {shouldHaveEqualHeight ? (
-          <div className="h-[500px] flex flex-col">
+          <div className="flex flex-col h-[400px]">
             <Component {...props} />
           </div>
         ) : (

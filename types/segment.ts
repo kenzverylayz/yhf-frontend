@@ -1,11 +1,10 @@
-export type SegmentsDoc = {
-  highspender: number;
-  midspender: number;
-  lowspender: number;
-  onetimespender: number;
-};
-  
 export type ClVSegment = {
-  name: string;
-  value: number;
+  segment: "High" | "Mid" | "Low";
+  count: number;
+  percentage: number;
+};
+
+export type SegmentsDoc = {
+  total_customers: number;
+  segments: ClVSegment[];
 };

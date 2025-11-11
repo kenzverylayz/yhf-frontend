@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { DashboardCard } from "@/components/DashboardCard";
 import YearFilter from "@/components/YearFilter";
 import {
@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import type { RevenueByMonthDoc } from "@/types/revenueByMonth";
 
 export type RevenuePoint = {
   month: string;
@@ -20,104 +21,126 @@ export type RevenuePoint = {
 
 type RevenueByMonthProps = {
   title?: string;
-  data?: Record<number, RevenuePoint[]>;
+  initialYear?: number;
+  data?: RevenueByMonthDoc; // initial data for the initial year
   showGrid?: boolean;
 };
 
-// Mock data for different years
-const mockData: Record<number, RevenuePoint[]> = {
-  2023: [
-    { month: "Jan", revenue: 12500 },
-    { month: "Feb", revenue: 13200 },
-    { month: "Mar", revenue: 12800 },
-    { month: "Apr", revenue: 14500 },
-    { month: "May", revenue: 13800 },
-    { month: "Jun", revenue: 15200 },
-    { month: "Jul", revenue: 14800 },
-    { month: "Aug", revenue: 16200 },
-    { month: "Sep", revenue: 15800 },
-    { month: "Oct", revenue: 17500 },
-    { month: "Nov", revenue: 16800 },
-    { month: "Dec", revenue: 18200 },
-  ],
-  2024: [
-    { month: "Jan", revenue: 18900 },
-    { month: "Feb", revenue: 19500 },
-    { month: "Mar", revenue: 19200 },
-    { month: "Apr", revenue: 20800 },
-    { month: "May", revenue: 20100 },
-    { month: "Jun", revenue: 21500 },
-    { month: "Jul", revenue: 21200 },
-    { month: "Aug", revenue: 22800 },
-    { month: "Sep", revenue: 22400 },
-    { month: "Oct", revenue: 23500 },
-    { month: "Nov", revenue: 23100 },
-    { month: "Dec", revenue: 24500 },
-  ],
-  2025: [
-    { month: "Jan", revenue: 25200 },
-    { month: "Feb", revenue: 25800 },
-    { month: "Mar", revenue: 25500 },
-    { month: "Apr", revenue: 26800 },
-    { month: "May", revenue: 26200 },
-    { month: "Jun", revenue: 27500 },
-    { month: "Jul", revenue: 27200 },
-    { month: "Aug", revenue: 28500 },
-    { month: "Sep", revenue: 28100 },
-    { month: "Oct", revenue: 29200 },
-    { month: "Nov", revenue: 28800 },
-    { month: "Dec", revenue: 30000 },
-  ],
-};
+const AVAILABLE_YEARS = [2023, 2024, 2025];
 
 export default function RevenueByMonth({
   title = "Revenue by Month",
-  data = mockData,
+  initialYear = AVAILABLE_YEARS[AVAILABLE_YEARS.length - 1],
+  data = [],
   showGrid = false,
 }: RevenueByMonthProps) {
-  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedYear, setSelectedYear] = useState(initialYear);
+  const [rawData, setRawData] = useState<RevenueByMonthDoc>(data ?? []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const currentYearData = useMemo(() => {
-    return data[selectedYear] || [];
-  }, [data, selectedYear]);
+  // Fetch data whenever the selected year changes.
+  useEffect(() => {
+    let cancelled = false;
 
-  const availableYears = useMemo(() => {
-    return Object.keys(data).map(Number).sort();
-  }, [data]);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const res = await fetch(`/api/revenue-by-month?year=${selectedYear}`);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch revenue by month: ${res.status}`);
+        }
+
+        const json: { year: number; data: RevenueByMonthDoc } = await res.json();
+        if (!cancelled) {
+          setRawData(json.data ?? []);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(err.message ?? "Failed to load data");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedYear]);
+
+  // Transform backend data into chart shape
+  const currentYearData = useMemo<RevenuePoint[]>(() => {
+    return (rawData ?? []).map((entry) => {
+      const [yearStr, monthPart] = entry.month.split("-");
+      const label = monthPart ?? entry.month;
+      return {
+        month: label,
+        revenue: entry.total_revenue,
+      };
+    });
+  }, [rawData]);
 
   return (
-    <DashboardCard 
+    <DashboardCard
       title={title}
       fullHeight
       headerActions={
         <YearFilter
           selectedYear={selectedYear}
           onYearChange={setSelectedYear}
-          years={availableYears}
+          years={AVAILABLE_YEARS}
         />
       }
     >
-      
-      <div className="flex-1 min-h-0 w-full flex items-center justify-center" style={{ outline: "none" }}>
+      <div
+        className="flex-1 min-h-0 w-full flex items-center justify-center"
+        style={{ outline: "none" }}
+      >
+          {isLoading && (
+          <div className="absolute top-2 right-4 text-xs text-gray-400">
+            Loading…
+          </div>
+        )}
+        {error && (
+          <div className="absolute top-2 right-4 text-xs text-red-400">
+            {error}
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={currentYearData} margin={{ top: 8, right: 30, bottom: 0, left: 0 }}>
-            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="var(--theme-border-primary)" />}
-            
+          <LineChart
+            data={currentYearData}
+            margin={{ top: 8, right: 30, bottom: 0, left: 0 }}
+          >
+            {showGrid && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--theme-border-primary)"
+              />
+            )}
+
             <XAxis
               dataKey="month"
               tickMargin={6}
               tick={{ fill: "var(--theme-text-muted)", fontSize: 12 }}
               axisLine={{ stroke: "var(--theme-border-primary)" }}
             />
-            
+
             <YAxis
               tick={{ fill: "var(--theme-text-muted)", fontSize: 12 }}
               axisLine={{ stroke: "var(--theme-border-primary)" }}
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
             />
-            
+
             <Tooltip
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+              formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
               labelFormatter={(label) => `${label} ${selectedYear}`}
               contentStyle={{
                 backgroundColor: "var(--theme-bg-card)",
@@ -127,7 +150,7 @@ export default function RevenueByMonth({
                 boxShadow: "var(--theme-shadow-card)",
               }}
             />
-            
+
             <Line
               type="monotone"
               dataKey="revenue"
@@ -143,7 +166,7 @@ export default function RevenueByMonth({
                 r: 6,
                 fill: "var(--theme-accent-primary)",
                 stroke: "var(--theme-bg-primary)",
-                strokeWidth: 3
+                strokeWidth: 3,
               }}
             />
           </LineChart>

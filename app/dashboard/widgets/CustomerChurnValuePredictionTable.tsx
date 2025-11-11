@@ -7,113 +7,32 @@ import { useEmail } from "@/lib/hooks/useEmail";
 import { imageToBase64 } from "@/lib/email-service";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
+import type { Customer } from "@/types/customer";
+import ApiParamsModal from "@/components/ApiParamsModal";
 
-type ChurnPredictionCustomer = {
-  id: string;
-  name: string;
-  email: string;
-  churnProbability: number;
-  predictedClv: number;
-  predictedOrderSize: number;
-  predictedOrderValue: number;
+type CustomerChurnValuePredictionTableProps = {
+  data?: Customer[];
 };
 
-const mockChurnData: ChurnPredictionCustomer[] = [
-  {
-    id: "12345",
-    name: "jy",
-    email: "jiayi747@gmail.com",
-    churnProbability: 85.2,
-    predictedClv: 1250.50,
-    predictedOrderSize: 2.3,
-    predictedOrderValue: 543.70
-  },
-  {
-    id: "12346",
-    name: "Sarah Johnson",
-    email: "sarah.j@email.com",
-    churnProbability: 72.8,
-    predictedClv: 890.25,
-    predictedOrderSize: 1.8,
-    predictedOrderValue: 494.58
-  },
-  {
-    id: "12347",
-    name: "Mike Wilson",
-    email: "mike.wilson@email.com",
-    churnProbability: 45.3,
-    predictedClv: 2100.75,
-    predictedOrderSize: 3.2,
-    predictedOrderValue: 656.48
-  },
-  {
-    id: "12348",
-    name: "Emily Davis",
-    email: "emily.davis@email.com",
-    churnProbability: 91.5,
-    predictedClv: 675.00,
-    predictedOrderSize: 1.5,
-    predictedOrderValue: 450.00
-  },
-  {
-    id: "12349",
-    name: "David Brown",
-    email: "david.brown@email.com",
-    churnProbability: 38.7,
-    predictedClv: 1850.30,
-    predictedOrderSize: 2.8,
-    predictedOrderValue: 660.82
-  },
-  {
-    id: "12350",
-    name: "Lisa Anderson",
-    email: "lisa.anderson@email.com",
-    churnProbability: 94.1,
-    predictedClv: 450.80,
-    predictedOrderSize: 1.2,
-    predictedOrderValue: 375.67
-  },
-  {
-    id: "12351",
-    name: "Robert Taylor",
-    email: "robert.taylor@email.com",
-    churnProbability: 28.4,
-    predictedClv: 3200.45,
-    predictedOrderSize: 4.1,
-    predictedOrderValue: 780.60
-  },
-  {
-    id: "12352",
-    name: "Jennifer Lee",
-    email: "jennifer.lee@email.com",
-    churnProbability: 67.9,
-    predictedClv: 1420.60,
-    predictedOrderSize: 2.6,
-    predictedOrderValue: 546.38
-  },
-  {
-    id: "12353",
-    name: "Michael Chen",
-    email: "michael.chen@email.com",
-    churnProbability: 52.3,
-    predictedClv: 1680.90,
-    predictedOrderSize: 3.0,
-    predictedOrderValue: 560.30
-  },
-  {
-    id: "12354",
-    name: "Amanda Rodriguez",
-    email: "amanda.rodriguez@email.com",
-    churnProbability: 79.6,
-    predictedClv: 980.15,
-    predictedOrderSize: 2.1,
-    predictedOrderValue: 466.74
-  }
-];
-
-export default function CustomerChurnValuePredictionTable() {
+export default function CustomerChurnValuePredictionTable({
+  data = [],
+}: CustomerChurnValuePredictionTableProps) {
   const [posterBase64, setPosterBase64] = useState<string | undefined>(undefined);
   const { isEmailSending, notification, sendEmail, clearNotification } = useEmail();
+
+  const [rows, setRows] = useState<Customer[]>(data ?? []);
+  const [perPage, setPerPage] = useState(10);
+  const [customer, setCustomer] = useState("");
+  const [riskLevel, setRiskLevel] = useState("");
+  const [clvSegment, setClvSegment] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [isParamsOpen, setIsParamsOpen] = useState(false);
+  const [draftPerPage, setDraftPerPage] = useState("10");
+  const [draftCustomer, setDraftCustomer] = useState("");
+  const [draftRiskLevel, setDraftRiskLevel] = useState("");
+  const [draftClvSegment, setDraftClvSegment] = useState("");
 
   // Load poster image and convert to base64
   useEffect(() => {
@@ -129,7 +48,30 @@ export default function CustomerChurnValuePredictionTable() {
     loadPoster();
   }, []);
 
-  // Auto-hide notification after 3 seconds
+  const handleOpenParams = () => {
+    setDraftPerPage(String(perPage));
+    setDraftCustomer(customer);
+    setDraftRiskLevel(riskLevel);
+    setDraftClvSegment(clvSegment);
+    setIsParamsOpen(true);
+  };
+
+  const handleChangeParam = (key: string, value: string) => {
+    if (key === "perPage") setDraftPerPage(value);
+    else if (key === "customer") setDraftCustomer(value);
+    else if (key === "risk_level") setDraftRiskLevel(value);
+    else if (key === "clv_segment") setDraftClvSegment(value);
+  };
+
+  const handleApplyParams = () => {
+    const nextPerPage = Math.max(1, Number(draftPerPage) || 1);
+    setPerPage(nextPerPage);
+    setCustomer(draftCustomer.trim());
+    setRiskLevel(draftRiskLevel.trim());
+    setClvSegment(draftClvSegment.trim());
+    setIsParamsOpen(false);
+  };
+
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => clearNotification(), 3000);
@@ -137,7 +79,54 @@ export default function CustomerChurnValuePredictionTable() {
     }
   }, [notification, clearNotification]);
 
-  const handleSendEmail = (customer: ChurnPredictionCustomer) => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const params = new URLSearchParams();
+        params.set("per_page", String(perPage));
+        if (customer.trim()) params.set("customer", customer.trim());
+        if (riskLevel.trim()) params.set("risk_level", riskLevel.trim());
+        if (clvSegment.trim()) params.set("clv_segment", clvSegment.trim());
+
+        const res = await fetch(`/api/customer-predictions?${params.toString()}`);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch customer predictions: ${res.status}`);
+        }
+
+        const json: {
+          page: number;
+          per_page: number;
+          customers: Customer[];
+        } = await res.json();
+
+        if (!cancelled) {
+          setRows(json.customers ?? []);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(err.message ?? "Failed to load customer predictions");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [perPage, customer, riskLevel, clvSegment]);
+
+  const handleSendEmail = (customer: Customer) => {
     sendEmail({
       customerEmail: customer.email,
       customerName: customer.name,
@@ -146,45 +135,48 @@ export default function CustomerChurnValuePredictionTable() {
     });
   };
 
-  const columns: ColumnDef<ChurnPredictionCustomer>[] = [
-    { accessorKey: "id", header: "ID" },
-    { accessorKey: "name", header: "Customer" },
+  const columns: ColumnDef<Customer>[] = [
+    { accessorKey: "customer", header: "Customer" },
     { accessorKey: "email", header: "Email" },
-    { 
-      accessorKey: "churnProbability", 
-      header: "Churn Probability (%)", 
-      cell: ({ getValue }) => (
-        <span className="tabular-nums font-medium">
-          {Number(getValue()).toFixed(1)}%
-        </span>
-      )
+    {
+      accessorKey: "risk_level",
+      header: "Risk Level",
+      cell: ({ getValue }) => {
+        const value = getValue() as string | undefined;
+        return <span>{value ?? "-"}</span>;
+      },
     },
-    { 
-      accessorKey: "predictedClv", 
-      header: "Predicted CLV ($)", 
-      cell: ({ getValue }) => (
-        <span className="tabular-nums">
-          ${Number(getValue()).toLocaleString()}
-        </span>
-      )
+    {
+      accessorKey: "churn_probability",
+      header: "Churn Probability (%)",
+      cell: ({ getValue }) => {
+        const n = Number(getValue() ?? 0);
+        return (
+          <span className="tabular-nums font-medium">
+            {(n * 100).toFixed(1)}%
+          </span>
+        );
+      },
     },
-    { 
-      accessorKey: "predictedOrderSize", 
-      header: "Predicted Order Size", 
-      cell: ({ getValue }) => (
-        <span className="tabular-nums">
-          {Number(getValue()).toFixed(1)}
-        </span>
-      )
+    {
+      accessorKey: "predicted_clv",
+      header: "Predicted CLV ($)",
+      cell: ({ getValue }) => {
+        const n = Number(getValue() ?? 0);
+        return (
+          <span className="tabular-nums">
+            ${n.toLocaleString()}
+          </span>
+        );
+      },
     },
-    { 
-      accessorKey: "predictedOrderValue", 
-      header: "Predicted Order Value ($)", 
-      cell: ({ getValue }) => (
-        <span className="tabular-nums">
-          ${Number(getValue()).toFixed(2)}
-        </span>
-      )
+    {
+      accessorKey: "clv_segment",
+      header: "CLV Segment",
+      cell: ({ getValue }) => {
+        const value = getValue() as string | undefined;
+        return <span>{value ?? "-"}</span>;
+      },
     },
     {
       id: "contact",
@@ -203,20 +195,54 @@ export default function CustomerChurnValuePredictionTable() {
   return (
     <>
       {notification && (
-        <div className={`fixed top-4 right-4 p-4 rounded-md z-50 ${
-          notification.type === 'success' 
-            ? 'bg-green-600 text-white' 
-            : 'bg-red-600 text-white'
-        }`}>
+        <div
+          className={`fixed top-4 right-4 p-4 rounded-md z-50 border shadow-lg ${
+            notification.type === "success"
+              ? "bg-green-600/90 border-green-400 text-white"
+              : "bg-red-600/90 border-red-400 text-white"
+          }`}
+        >
           {notification.message}
         </div>
       )}
       <DashboardCard title="Customer Churn & Value Prediction">
-        <FilterableTable<ChurnPredictionCustomer> 
-          columns={columns} 
-          data={mockChurnData} 
-          height={280} 
-        />
+        <div className="flex-1 min-h-0 flex flex-col">
+          {error && (
+            <div className="mb-2 text-xs text-red-500">{error}</div>
+          )}
+          <FilterableTable<Customer>
+            columns={columns}
+            data={rows ?? []}
+            height={280}
+          />
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+            <div className="flex items-center gap-2">
+              <span>{perPage} per page</span>
+              <button
+                className="rounded border px-2 py-1 text-[11px] hover:bg-gray-700/30 transition-colors mt-[1px]"
+                onClick={handleOpenParams}
+                disabled={isLoading}
+              >
+                Edit params
+              </button>
+            </div>
+            <div className="space-x-2">
+            </div>
+          </div>
+          <ApiParamsModal
+            open={isParamsOpen}
+            title="Edit Customer Prediction API Params"
+            params={[
+              { key: "perPage", label: "Per page", type: "number", value: draftPerPage },
+              { key: "customer", label: "Customer contains", type: "text", value: draftCustomer },
+              { key: "risk_level", label: "Risk level (Low/Medium/High)", type: "text", value: draftRiskLevel },
+              { key: "clv_segment", label: "CLV segment (Low/Mid/High)", type: "text", value: draftClvSegment },
+            ]}
+            onChange={handleChangeParam}
+            onApply={handleApplyParams}
+            onClose={() => setIsParamsOpen(false)}
+          />
+        </div>
       </DashboardCard>
     </>
   );

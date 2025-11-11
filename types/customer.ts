@@ -1,42 +1,24 @@
-export type CustomerDoc = {
-  AOV: number;
-  CLV: number;
-  "Customer ID": string;
-  Email: string;
-  Membership: string;
-  Name: string;
-
-  "Order Count": number;
-  "Order Interval (Days)": number;
-
-  "FM Segment": string;
-  "RF Segment": string;
-  "RFM Segment": string;
-  "RM Segment": string;
-  RFM: number;
-
-  "First Ordered"?: FirebaseFirestore.Timestamp | null;
-  "Last Ordered"?: FirebaseFirestore.Timestamp | null;
-};
-
 export type Customer = {
-  id: string;
-  aov: number;
-  clv: number;
-  customerId: string;
-  email: string;
+  // Common identifiers
+  id: number;
+  customerId?: number;
+
+  // Basic customer info
   name: string;
-  membership: string;
+  email: string;
+  membership?: string;
 
-  orderCount: number;
-  orderIntervalDays: number;
+  // Order metrics
+  orderCount?: number;
+  averageOrderValue?: number;
+  lifetimeCustomerValue?: number;
+  orderIntervalDays?: number | null;
+  firstOrdered?: string | null;
+  lastOrdered?: string | null;
 
-  fmSegment: string;
-  rfSegment: string;
-  rfmSegment: string;
-  rmSegment: string;
-  rfm: number;
-
-  firstOrdered: string | null; 
-  lastOrdered: string | null; 
+  // Prediction-related fields (from /customer-predictions)
+  churn_probability?: number;
+  risk_level?: "Low" | "Medium" | "High";
+  predicted_clv?: number;
+  clv_segment?: "Low" | "Medium" | "High";
 };
