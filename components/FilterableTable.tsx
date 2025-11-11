@@ -82,7 +82,7 @@ export default function FilterableTable<TData>({
                 <tr key={hg.id} className="border-b border-[var(--theme-border-primary)]">
                   {hg.headers.map((header) => {
                     const colId = header.column.id;
-                    const filterOptions = header.column.columnDef.meta?.filterOptions;
+                    const filterOptions = (header.column.columnDef.meta as { filterOptions?: string[] })?.filterOptions;
                     const currentFilter = header.column.getFilterValue() || "";
 
                     return (
