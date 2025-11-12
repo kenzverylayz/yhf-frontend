@@ -9,6 +9,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
 import type { Customer } from "@/types/customer";
 import ApiParamsModal from "@/components/ApiParamsModal";
+import DownloadButton from "@/components/DownloadButton";
 
 type CustomerChurnValuePredictionTableProps = {
   data?: Customer[];
@@ -215,6 +216,14 @@ export default function CustomerChurnValuePredictionTable({
             data={rows ?? []}
             height={280}
           />
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-black/20 z-10 rounded-lg">
+              <div className="flex flex-col items-center">
+                <div className="w-6 h-6 border-2 border-white/60 border-t-transparent rounded-full animate-spin mb-2"></div>
+                <span className="text-sm text-white/80">Loading data…</span>
+              </div>
+            </div>
+          )}
           <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
             <div className="flex items-center gap-2">
               <span>{perPage} per page</span>
@@ -227,6 +236,7 @@ export default function CustomerChurnValuePredictionTable({
               </button>
             </div>
             <div className="space-x-2">
+              <DownloadButton data={rows} filename="customer_predictions.csv" />
             </div>
           </div>
           <ApiParamsModal

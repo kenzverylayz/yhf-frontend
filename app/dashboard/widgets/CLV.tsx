@@ -141,7 +141,17 @@ export default function CLV({
             {error}
           </div>
         )}
-        <FilterableTable<Customer> columns={columns} data={rows ?? []} />
+        <div className="relative">
+          <FilterableTable<Customer> columns={columns} data={rows ?? []} />
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-black/20 z-10 rounded-lg">
+                <div className="flex flex-col items-center">
+                  <div className="w-6 h-6 border-2 border-white/60 border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <span className="text-sm text-white/80">Loading data…</span>
+                </div>
+              </div>
+            )}
+          </div>
         <div className="mt-2 flex items-center justify-between text-xs text-gray-500 border-t border-gray-700/50 pt-2">
           <div className="flex items-center gap-2">
             <span>Page {page}</span>
