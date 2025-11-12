@@ -43,6 +43,8 @@ type BasePieChartProps = {
   totalLabel?: string;
   tooltipFormatter?: (value: number, name: string) => [string, string];
   height?: string;
+  colors?: string[];
+  hoverColors?: Record<string, string>;
 };
 
 export default function BasePieChart({
@@ -54,14 +56,45 @@ export default function BasePieChart({
   totalLabel = "Total",
   tooltipFormatter,
   height = "h-96",
+  colors: customColors,
+  hoverColors: customHoverColors,
 }: BasePieChartProps) {
   const total = data.reduce((acc, d) => acc + d.value, 0);
-  const colors = STANDARD_COLORS.slice(0, data.length);
+  const colors = customColors || STANDARD_COLORS.slice(0, data.length);
+  const hoverColors = customHoverColors || HOVER_COLORS;
 
   // Default tooltip formatter
   const defaultTooltipFormatter = (value: number, name: string) => {
     const percentage = ((value / total) * 100).toFixed(0);
     return [`${percentage}%`, name];
+  };
+
+  // Custom legend content to preserve data order
+  const renderCustomLegend = () => {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        flexWrap: 'wrap',
+        gap: '16px',
+        paddingTop: '8px'
+      }}>
+        {data.map((item, index) => (
+          <div key={item.name} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            color: 'var(--theme-text-secondary)',
+            fontSize: '12px'
+          }}>
+            <svg width="14" height="14">
+              <circle cx="7" cy="7" r="6" fill={colors[index % colors.length]} />
+            </svg>
+            <span>{item.name}</span>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const tooltipContent = ({ active, payload }: any) => {
@@ -98,7 +131,7 @@ export default function BasePieChart({
             {showLegend && (
               <Legend
                 verticalAlign="bottom"
-                iconType="circle"
+                content={renderCustomLegend}
                 wrapperStyle={{ 
                   color: "var(--theme-text-secondary)",
                   fontSize: '12px',
@@ -124,7 +157,7 @@ export default function BasePieChart({
             >
               {data.map((_, i) => {
                 const originalColor = colors[i % colors.length];
-                const lighterColor = HOVER_COLORS[originalColor] || originalColor;
+                const lighterColor = hoverColors[originalColor] || originalColor;
                 
                 return (
                   <Cell 

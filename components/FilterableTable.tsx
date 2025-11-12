@@ -58,7 +58,7 @@ export default function FilterableTable<TData>({
                     <th
                       key={header.id}
                       className="px-4 py-3 text-left font-semibold uppercase tracking-wide 
-                                 text-[11px] text-[var(--theme-text-secondary)] cursor-pointer 
+                                 text-[11px] text-[var(--theme-accent-primary)] cursor-pointer 
                                  select-none hover:bg-[var(--theme-bg-hover)] transition-colors"
                       onClick={header.column.getToggleSortingHandler()}
                     >

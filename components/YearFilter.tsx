@@ -15,7 +15,7 @@ export default function YearFilter({
 }: YearFilterProps) {
   return (
     <div className="flex items-center gap-2">
-      <label className="text-sm font-medium text-[var(--theme-text-secondary)]">
+      <label className="text-sm font-medium text-[var(--theme-accent-primary)]">
         {label}:
       </label>
       <select
